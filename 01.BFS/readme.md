@@ -285,10 +285,111 @@ int main()
 **알고리즘 설계**  
 1. 시작점이 여러개일 때, 큐에 먼저 다 넣고 BFS 시작
 2. 익지않은 토마토 거리 -1로 방문여부 체크
-3. 토마토 시작점으로 방문할 필요없거나 `vis[nx][ny] = 0` 이미 익지 않은 토마토에 방문한 `vis[nx][ny] > 0` 부분 탐색 X
+3. 토마토 시작점으로 방문할 필요없거나 `vis[nx][ny] = 0` 이미 익지 않은 토마토에 방문한 `vis[nx][ny] > 0` 부분 탐색 pass
 4. 상하좌우의 탐색하기 전 거리를 + 1 해가면서 시작점과의 거리를 구해, 총 익는데 걸린 일 수 구함  
 
 ### BOJ 4179_불!
 ```cpp
+#include <bits/stdc++.h>
+using namespace std;
 
+#define X first
+#define Y second
+int dx[4] = {1, 0, -1, 0};
+int dy[4] = {0, 1, 0, -1};
+
+int R, C;
+string board[1002]; // 미로 입력
+int jtime[1002][1002]; // 지훈이의 시간
+int ftime[1002][1002]; // 불에 대한 시간
+
+void input(){
+    cin >> R >> C;
+    for(int i=0; i < R; i++){
+        cin >> board[i];
+        fill(ftime[i], ftime[i] + C, -1);
+        fill(jtime[i], jtime[i] + C, -1);
+    }
+
+    return;
+}
+
+void fire_bfs(){
+    queue<pair<int, int>> fq; // 불에 대한 dfs
+    for(int i=0; i < R; i++){
+        for(int j=0; j < C; j++){
+            if(board[i][j] == 'F'){
+                fq.push({i, j}); // 불의 시작점
+                ftime[i][j] = 0;
+            }
+        }
+    }
+
+    while(!fq.empty()){
+        pair<int, int> cur = fq.front(); fq.pop();
+        for(int dir=0; dir < 4; dir++){
+            int nx = cur.X + dx[dir];
+            int ny = cur.Y + dy[dir];
+            if(nx < 0 || ny < 0 || nx >= R || ny >= C) continue;
+            // 이미 방문한 곳이거나 . 이 아니면 pass
+            if(ftime[nx][ny] >= 0 || board[nx][ny] != '.') continue;
+            ftime[nx][ny] = ftime[cur.X][cur.Y] + 1;
+            fq.push({nx, ny}); 
+        }
+    }
+}
+
+void jihoon_bfs(){
+    queue<pair<int, int>> jq; // 지훈이에 대한 dfs
+    for(int i=0; i < R; i++){
+        for(int j=0; j < C; j++){
+            if(board[i][j] == 'J'){
+                jq.push({i, j}); // 지훈이의 시작점
+                jtime[i][j] = 0;
+            }
+        }
+    }
+    
+    while(!jq.empty()){
+        pair<int, int> cur = jq.front(); jq.pop();
+        for(int dir=0; dir < 4; dir++){
+            int nx = cur.X + dx[dir];
+            int ny = cur.Y + dy[dir];
+            // 탈출한 경우 : 범위 벗어난 것은 탈출했다는 소리니까 ~
+            if(nx < 0 || ny < 0 || nx >= R || ny >= C){
+                cout << jtime[cur.X][cur.Y]+1;
+                return;
+            }
+            // 이미 방문한 곳이거나 .이 아니면 pass
+            if(jtime[nx][ny] >= 0 || board[nx][ny] != '.') continue;
+            // 불에 의해 통과하지 못하는 경우 : 불이 이미 방문했거나 불이 먼저 도착한 경우
+            if(ftime[nx][ny] >= 0 && ftime[nx][ny] <= jtime[cur.X][cur.Y] + 1) continue;
+            jtime[nx][ny] = jtime[cur.X][cur.Y] + 1;
+            jq.push({nx, ny}); 
+        }
+    }
+    cout << "IMPOSSIBLE";
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    input();
+    fire_bfs();
+    jihoon_bfs();
+
+    return 0;
+}
 ```
+**알고리즘 설계**
+1. 지훈이와 불에 대한 BFS 각각 나눠서 탐색
+2. 불에 대한 탐색시간 먼저 BFS 탐색 통해 구함 -> 이미 방문했거나, .이 아닌 경우(=# 벽인 경우) pass
+3. 지훈이에 대한 탐색 시간 통해, 미로 통과 가능한지 안한지 여부 판단
+   1. 탐색 시, 미로 크기의 범위를 넘어서면 통과! -> 탐색 시간 반환
+   2. pass하는 경우 
+   * 이미 방문했거나 .이 아닌 경우 pass
+   * 불에 의해 통과하지 못하는 경우 
+     - 불이 이미 방문 `ftime[nx][ny] >= 0`
+     - 불이 먼저 도착한 경우 `ftime[nx][ny] <= jtime[cur.X][cur.Y] + 1`
+   3. DFS 탐색 후에도 반환되지 못했으면, IMPOSSIBLE 출력

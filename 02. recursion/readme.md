@@ -219,6 +219,175 @@ int main()
 }
 ```
 
+**알고리즘 설계**
+1. 함수의 정의
+    void recursion(int n, string str);
+    각 문장을 n개만큼 str = _ _ _ _ 만큼 추가하여 출력하는 함수
+
+2. base condition
+    n = 0일 때, 마지막에만 출력하는 문장 출력력
+
+3. 재귀 식
+    n, n-1, n-2 ... 0까지 _ _ _ _ 를 x2배씩 앞에 늘려가며 출력하는 함수
+
+### 1780_종이의 개수  
+-> NxN 크기의 종이를 9등분해서 모두 같은 수로만 채워진 종이인지 판단해야 함
+-> 같은 수가 아니면 다시 9등분 → 재귀적 접근 필요
+
+```cpp
+// 1780 종이의 개수
+// 내가 못품...
+#include <iostream>
+using namespace std;
+
+int n;
+int paper[2200][2200];
+int cnt[3]; // -1 0 1 수
+
+// 해당 종이 내부에 같은 숫자로만 채워져있는지 확인하는 함수
+bool check(int y, int x, int z){
+    for(int i=y; i < y+z; ++i){
+        for(int j=x; j < x+z; ++j){
+            if(paper[y][x] != paper[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+void solve(int y, int x, int z){
+    // 같은 숫자로만 채워져있으면 cnt 추가
+    if(check(y, x, z)){
+        cnt[paper[y][x] + 1]++;
+        return;
+    }
+    int N = z / 3;
+    // 9등분으로 나눠서 다시 재귀 탐색 
+    for(int i=0; i < 3 ; ++i){
+        for(int j=0; j < 3; ++j){
+            solve(y + i*N, x + j*N, N);
+        }
+    }
+}
+
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    
+    cin >> n;
+    for(int y=0; y < n; ++y)
+        for(int x=0; x < n; ++x)
+            cin >> paper[y][x];
+    
+    solve(0, 0, n);
+    for(int i=0; i < 3 ;i++)    cout << cnt[i] << '\n';
+    return 0;
+}
+```  
+**알고리즘 설계**
+1. 함수의 정의  
+`bool check(int y, int x, int z)`  
+(y, x)부터 z x z 크기의 종이가 모두 같은 숫자인지 확인하는 함수  
+`void solve(int y, int x, int z)`  
+(y,x)부터 z x z종이를 같은 숫자라면 cnt++ / 아니라면 9등분해서 재귀 호출
+
+2. base conditon  
+```cpp
+    if(check(y, x, z)){
+        cnt[paper[y][x] + 1]++;
+        return;
+    }
+```
+-> 현재 영역이 모두 같은 숫자라면 반환
+
+3. 재귀 식  
+9등분으로 나누어서 재귀 탐색 시작
+```cpp
+    for(int i=0; i < 3 ; ++i){
+        for(int j=0; j < 3; ++j){
+            solve(y + i*N, x + j*N, N);
+        }
+    }
+```
+### 1992_쿼드트리 ###   
+```cpp
+// 1992 쿼드트리
+#include <iostream>
+using namespace std;
+
+int N;
+string quad[64];
+
+// 현재 (y, x) 위치에서 n x n 크기의 영역이 모두 같은 숫자인지 확인하는 함수
+bool check(int y, int x, int n){
+    for(int i=y; i < y+n; ++i){
+        for(int j=x; j < x+n; ++j){
+            if(quad[y][x] != quad[i][j])
+                return false;
+        }
+    }
+    return true;
+}
+
+void solve(int y, int x, int n){
+    if(check(y, x, n)){ // 모든 숫자 같으면 해당 숫자 출력
+        cout << quad[y][x];
+        return;
+    }
+
+    // 모두 같은 수가 아니라면, 
+    // n/2 * n/2으로 영역 4등분 하여 재귀 
+    cout << "(";
+    solve(y, x, n/2); // 왼쪽 위
+    solve(y, x+n/2, n/2); // 오른쪽 위
+    solve(y+n/2, x, n/2); // 왼쪽 아래
+    solve(y+n/2, x+n/2, n/2); // 오른쪽 아래
+    cout << ")";
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> N;
+    for(int i=0; i < N; ++i){
+        cin >> quad[i];
+    }
+    solve(0, 0, N);
+    
+    return 0;
+}
+```
+1. 함수의 정의
+```cpp
+void solve(int y, int x, int n);
+```
+(y,x)를 좌측 상단부터 시작해서 크기가 nxn인 정사각형 영역에 대해 쿼트 트리 문자열 출력하는 함수
+
+2. base condition
+```cpp
+if (check(y, x, n)) {
+    cout << quad[y][x];
+    return;
+}
+```
+현재 영역의 모든 값이 동일하면 더 이상 쪼갤 필요가 없으므로, 그 숫자(0 or 1)만 출력하고 재귀 종료
+
+3. 재귀 식
+```cpp
+    cout << "(";
+    solve(y, x, n/2);             // 왼쪽 위
+    solve(y, x + n/2, n/2);       // 오른쪽 위
+    solve(y + n/2, x, n/2);       // 왼쪽 아래
+    solve(y + n/2, x + n/2, n/2); // 오른쪽 아래
+    cout << ")";
+```
+같은 숫자아니면 4등분해서, 각 영역 순서대로 재귀 호출
+
+
+
+
  
 
 

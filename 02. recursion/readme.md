@@ -118,3 +118,75 @@ n=1일때, `cout << a << ' ' << b << '\n;`
 * 옮긴 횟수: 원판 K개를 옮기기 위해 A번이 필요하다면, k+1개를 옮길 때는 k개의 원판을 빈 곳으로 옮길 때 A번, k+1번 원판을 옮길 때 1번, k개의 원판을 다시 빈곳에서 목적지로 옮길 때 A번이 필요하니 2A+1번 이동이 필요
 -> 즉,, 초항이 1이라 이 수열의 일반항은 $2^k-1$이 된다.
 
+```cpp
+#include <iostream>
+using namespace std;
+
+void func(int a, int b, int n){
+    if(n == 1) {
+        cout << a << ' ' << b << '\n';
+        return ;
+    }
+    func(a, 6-a-b, n-1); // n-1개의 원판을 a번(출발지)에서 6-a-b로 이동(6은 기둥 번호 1+2+3=6)
+    cout << a << ' ' << b << '\n'; // n번째 원판 기둥 a에서 b로 이동
+    func(6-a-b, b, n-1); // n-1개의 원판을 6-a-b번에서 b번으로 이동동
+
+    return;
+}
+
+int main()
+{
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    int k;
+    cin >> k;
+
+    cout << (1<<k) - 1 << '\n'; // 옮긴 횟수
+    func(1, 3, k);
+
+    return 0;
+
+
+
+}
+```
+
+### 1074_Z
+1. 함수의 정의  
+    `int func(int n, int r, int c)`  
+    $2^n * 2^n$배열에서 (r,c) 를 방문하는 순서를 반환하는 함수  
+
+2. base condition  
+    n = 0일때, `return 0;`  
+
+3. 재귀식  
+    (r, c)가 1번 사각형일 때, `return func(n-1, r, c);`  
+    (r,c)가 2번 사각형일 때, `return half*half + func(n-1, r, c-h);`  
+    (r,c)가 3번 사각형일 때, `return 2*half *half + func(n-1, r-half, c);`  
+    (r,c)가 4번 사각형일 때, `return 3*half *half + func(n-1, r-half, c-half);`  
+    -> half는 한 변 길이의 절반
+ ```cpp
+ #include <iostream>
+using namespace std;
+
+int func(int n, int r, int c){
+    if(n==0)    return 0;
+    int half = 1 << (n-1); // 한 변 길이의 절반
+    if(r < half && c < half)    return func(n-1, r, c);
+    if(r < half && c >= half)    return half*half + func(n-1, r, c-half);
+    if(r >= half && c < half)    return 2*half*half + func(n-1, r-half, c);
+    if(r >= half && c >= half)   return 3*half*half + func(n-1, r-half, c-half);
+}
+
+int main(){
+    int n, r, c;
+    cin >> n >> r >> c;
+    cout << func(n, r, c);
+    return 0;
+}
+ ```
+
+ 
+
+

@@ -407,7 +407,6 @@ bool check(int y, int x, int n){
 
 void solve(int y, int x, int n){
     if(check(y, x, n)){
-        //cout << "e"<< cnt[0] << '\n';
         ++cnt[paper[y][x]];
         return ;
     }

@@ -341,6 +341,291 @@ int main(){
     return 0;
 }
 ```
+### 15655 N과 M(6)
+https://www.acmicpc.net/problem/15655  
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int isused[10];
+int res[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)
+            cout << res[i] << ' ';
+        cout << '\n';
+        return;
+    }
+
+    for(int i=0; i < N; ++i){
+        if(!isused[i] && (k==0 || res[k-1] <= arr[i])){
+            res[k] = arr[i];
+            isused[i] = 1;
+            func(k+1);
+            isused[i] = 0;
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> N >> M;
+    for(int i=0; i < N; ++i){
+        cin >> arr[i];
+    }
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
+
+### 15656 N과 M(7)
+https://www.acmicpc.net/problem/15656
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)    cout << res[i] << ' ';
+        cout << '\n';
+        return;
+    }
+
+    for(int i=0; i < N; ++i){
+        res[k] = arr[i];
+        func(k+1);
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> N >> M;
+    for(int i=0; i < N; ++i)    cin >> arr[i];
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
+### 15657 N과 M(8)
+https://www.acmicpc.net/problem/15657
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i){
+            cout << res[i] << ' ';
+        }
+        cout << '\n';
+        return;
+    }
+
+    for(int i=0; i < N; ++i){
+        if(k == 0 || res[k-1] <= arr[i]){
+            res[k] = arr[i];
+            func(k+1);
+        }
+    }
+
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> N >> M;
+    for(int i=0; i < N; ++i)    cin >> arr[i];
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
+
+### 15663_N과 M(9)
+https://www.acmicpc.net/problem/15663  
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+int isused[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)    cout << res[i] << ' ';
+        cout << '\n';
+        return;
+    }
+
+    int prev_val = -1;
+
+    for(int i=0; i < N; ++i){
+        if(!isused[i] && prev_val != arr[i]){
+            res[k] = arr[i];
+            isused[i] = 1;
+            prev_val = arr[i];
+            func(k+1);
+            isused[i] = 0;
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> N >> M;
+    for(int i=0; i < N; ++i)    cin >> arr[i];
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
+
+### 15664_N과 M(10)
+https://www.acmicpc.net/problem/15664
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+int isused[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)    cout << res[i] << ' ';
+        cout << '\n';
+    }
+
+    int pre = -1;
+    for(int i=0; i < N; ++i){
+        if(!isused[i] && pre != arr[i] && (k == 0 || res[k-1] <= arr[i])){
+            res[k] = arr[i];
+            isused[i] = 1;
+            pre = arr[i];
+            func(k+1);
+            isused[i] = 0;
+        }
+    }
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> N >> M;
+    for(int i=0; i < N; ++i)    cin >> arr[i];
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
+
+### 15665_N과 M(11)
+https://www.acmicpc.net/problem/15665  
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)    cout << res[i] << ' ';
+        cout << '\n';
+        return;
+    }
+
+    int pre = -1;
+    for(int i=0; i < N; ++i){
+        if(pre != arr[i]){
+            res[k] = arr[i];
+            pre = arr[i];
+            func(k+1);
+        }
+    }
+
+
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    
+    cin >> N >> M;
+    for(int i=0; i < N; ++i)    cin >> arr[i];
+    sort(arr, arr+N);   
+    func(0);
+
+    return 0;
+}
+```
+
+### 15666_N과 M(12)
+https://www.acmicpc.net/problem/15666  
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int N, M;
+int arr[10];
+int res[10];
+
+void func(int k){
+    if(k == M){
+        for(int i=0; i < M; ++i)    cout << res[i] << ' ';
+        cout << '\n';
+        return; 
+    }
+
+    int pre = -1;
+    for(int i=0; i < N; ++i){
+        if(pre != arr[i] && (k==0 || res[k-1] <= arr[i])){
+            res[k] = arr[i];
+            pre = arr[i];
+            func(k+1);
+        }
+    }
+
+}
+int main(){
+
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> N >> M;
+    for(int i=0; i < N; ++i) cin >> arr[i];
+    sort(arr, arr+N);
+    func(0);
+    return 0;
+}
+```
 
 
 

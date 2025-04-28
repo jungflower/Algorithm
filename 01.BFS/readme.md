@@ -393,3 +393,83 @@ int main(){
      - 불이 이미 방문 `ftime[nx][ny] >= 0`
      - 불이 먼저 도착한 경우 `ftime[nx][ny] <= jtime[cur.X][cur.Y] + 1`
    3. DFS 탐색 후에도 반환되지 못했으면, IMPOSSIBLE 출력
+
+### 7562_나이트의 이동
+https://www.acmicpc.net/problem/7562  
+문제
+체스판 위에 한 나이트가 놓여져 있다. 나이트가 한 번에 이동할 수 있는 칸은 아래 그림에 나와있다. 나이트가 이동하려고 하는 칸이 주어진다. 나이트는 몇 번 움직이면 이 칸으로 이동할 수 있을까?  
+![alt text](image.png)
+
+입력
+입력의 첫째 줄에는 테스트 케이스의 개수가 주어진다.
+
+각 테스트 케이스는 세 줄로 이루어져 있다. 첫째 줄에는 체스판의 한 변의 길이 l(4 ≤ l ≤ 300)이 주어진다. 체스판의 크기는 l × l이다. 체스판의 각 칸은 두 수의 쌍 {0, ..., l-1} × {0, ..., l-1}로 나타낼 수 있다. 둘째 줄과 셋째 줄에는 나이트가 현재 있는 칸, 나이트가 이동하려고 하는 칸이 주어진다.
+```cpp
+// 7562 나이트의 이동
+#include <iostream>
+#include <queue>
+using namespace std;
+
+struct Pos{int y, x; };
+int dy[8] = {-2, -2, -1, -1, 1, 1, 2, 2};
+int dx[8] = {-1, 1, -2, 2, -2, 2, -1, 1};
+int vis[302][302]; // 체스판 방문 여부
+int t, l;
+Pos start, goal;
+
+void input()
+{
+    cin >> l;
+    cin >> start.y >> start.x;
+    cin >> goal.y >> goal.x;
+
+    for(int i=0; i < l; ++i){
+        fill(vis[i], vis[i]+l, -1);
+    }
+
+    return;
+}
+
+void bfs()
+{
+    queue<Pos> q;
+    q.push({start.y, start.x});
+    vis[start.y][start.x] = 0; // 시작점 0으로 시작
+
+    if(start.y == goal.y && start.x == goal.x){
+        cout << 0 << '\n';
+        return;
+    }
+
+    while(!q.empty()){
+       Pos cur = q.front(); q.pop();
+       for(int dir=0; dir < 8; ++dir){
+            int ny = cur.y + dy[dir];
+            int nx = cur.x + dx[dir];
+            if(ny == goal.y && nx == goal.x){
+                cout << vis[cur.y][cur.x] + 1 << '\n';
+                return;
+            }
+            if(ny < 0 || nx < 0 || ny >= l || nx >= l)  continue;
+            if(vis[ny][nx] >= 0) continue; // 방문한 적 있으면 pass
+            vis[ny][nx] = vis[cur.y][cur.x] + 1;
+            q.push({ny, nx});
+       } 
+    }
+    return;
+}
+
+int main(){
+
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> t;
+    while(t--){
+        input();
+        bfs();
+    }
+
+    return 0;
+}
+```

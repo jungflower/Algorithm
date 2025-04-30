@@ -169,3 +169,171 @@ int main(void){
 }
 ```
 
+### 1149_RGB거리###
+1. 테이블 정의하기  
+`dp[i][0]` = i번째 집의 색깔 선택했을 때, 비용의 최솟값, i번째 집은 빨간색  
+`dp[i][1]` = i번째 집의 색깔 선택했을 때, 비용의 최솟값, i번째 집은 초록색  
+`dp[i][2]` = i번째 집의 색깔 선택했을 때, 비용의 최솟값, i번째 집은 파란색  
+2. 점화식 찾기  
+`D[k][0] = min(D[k-1][1], D[k-1][2]) + house[i][0]`  
+`D[k][1] = min(D[k-1][0], D[k-1][2]) + house[i][1]`  
+`D[k][2] = min(D[k-1][0], D[k-1][1]) + house[i][2]`
+
+3. 초기값 설정  
+`dp[1][0] = house[1][0]`  
+`dp[1][1] = house[1][1]`   
+`dp[1][2] = house[1][2]` 
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+int n;
+int house[1002][3];
+int dp[1002][3];
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n;
+    for(int i=1; i <= n; ++i){
+        for(int j=0; j < 3; ++j){
+            cin >> house[i][j];
+            
+        }
+    }
+    // 초기값
+    dp[1][0] = house[1][0]; dp[1][1] = house[1][1]; dp[1][2] = house[1][2];
+
+    for(int i=2; i <= n; ++i){
+        dp[i][0] = min(dp[i-1][1], dp[i-1][2]) + house[i][0];
+        dp[i][1] = min(dp[i-1][0], dp[i-1][2]) + house[i][1];
+        dp[i][2] = min(dp[i-1][0], dp[i-1][1]) + house[i][2];
+    }
+    
+    cout << min({dp[n][0], dp[n][1], dp[n][2]});
+
+    return 0;
+}
+```
+
+### 11726_2xn 타일링  
+1. 테이블 정의하기  
+`dp[i]` = 2 x i크기의 직사각형을 채우는 방법의 수   
+2. 점화식 찾기  
+`D[k][0] = min(D[k-1][1], D[k-1][2]) + house[i][0]`  
+`D[k][1] = min(D[k-1][0], D[k-1][2]) + house[i][1]`  
+`D[k][2] = min(D[k-1][0], D[k-1][1]) + house[i][2]`
+
+3. 초기값 설정  
+`dp[1][0] = house[1][0]`  
+`dp[1][1] = house[1][1]`   
+`dp[1][2] = house[1][2]` 
+```cpp
+#include <iostream>
+using namespace std;
+
+int n;
+int dp[1002];
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n;
+    dp[1] = 1;
+    dp[2] = 2;
+    for(int i=3; i<=n; ++i){
+        dp[i] = (dp[i-1] + dp[i-2]) % 10007;
+    }
+    cout << dp[n];
+    return 0;
+}
+```
+### 11659_구간 합 구하기4  
+- prefix sum = 누적합 문제  
+`D[i] = A[1] + A[2] ... + A[i]`  
+`D[i] = D[i-1] + A[i]`  
+
+`A[i] + A[i-1] + ... + A[j]`  
+= `(A[1] + A[2] + ... A[j]) - (A[1] + A[2] + ... + A[i-1])`  
+= `D[j] - D[i-1]`  
+```cpp
+#include <iostream>
+using namespace std;
+
+int n, m;
+int dp[100002];
+int A[100002];
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    cin >> n >> m;
+    for(int i=1; i<=n; ++i){
+        cin >> A[i];
+    }
+
+    // 구간합 구하기
+    dp[1] = A[1];
+    for(int i=2; i<=n; ++i){
+        dp[i] = dp[i-1] + A[i];
+    }
+
+    while(m--){
+        int i, j;
+        cin >> i >> j;s
+        cout << dp[j] - dp[i-1] << '\n';
+    }
+
+    return 0;
+}
+```
+### 12852_1로 만들기2 ### 
+dp[i] : 1로 만들어질 수 있는 횟수 테이블  
+pre[i] : 경로 추적용 테이블   
+![alt text](image-1.png)
+
+```cpp
+#include <iostream>
+using namespace std;
+
+int n;
+int dp[1000002], pre[1000002];
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n;
+    dp[1] = 0;
+    pre[1] = 0;
+
+    for(int i = 2; i <= n; ++i){
+        dp[i] = dp[i-1] + 1;
+        pre[i] = i-1;
+
+        if(i % 3 == 0 && dp[i/3] + 1 < dp[i]){
+            dp[i] = dp[i/3] + 1;
+            pre[i] = i/3;
+        }
+        if(i % 2 == 0 && dp[i/2] + 1 < dp[i]){
+            dp[i] = dp[i/2] + 1;
+            pre[i] = i/2;
+        }
+    }
+
+    cout << dp[n] << '\n';
+    
+    int cur = n;
+    while(1){
+        cout << cur << ' ';
+        if(cur == 1)    break;
+        cur = pre[cur];
+    }
+
+    return 0;
+}
+```
+

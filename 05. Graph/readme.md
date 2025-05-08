@@ -257,7 +257,232 @@ BFS와 같이 모든 정점이 스택에 최대 1번씩 들어가므로 인접�
 ## 예제
 ### 11724_연결 요소의 개수  
 ```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
 
+int n, m, cnt;
+vector<int> adj[1002];
+bool vis[1002];
+
+void bfs(){
+    queue<int> q;
+    for(int i=1; i <= n; ++i){
+        if(vis[i])  continue;
+        q.push(i);
+        vis[i] = true;
+        cnt++;
+        while(!q.empty()){
+            int cur = q.front(); q.pop();
+            for(auto nxt : adj[cur]){
+                if(vis[nxt])    continue;
+                q.push(nxt);
+                vis[nxt] = true;
+            }
+        }
+    }
+    cout << cnt;
+    return ;
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n >> m;
+    for(int i=0; i < m; ++i){
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    bfs();
+
+    return 0;
+}
 ```
 
+### 1260_DFS와 BFS
+```cpp
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include <queue>
+#include <cstring>
+using namespace std;
 
+int n, m, start;
+vector<int> adj[1002];
+bool vis[1002];
+
+void dfs(int cur){
+    vis[cur] = true;
+    cout << cur << ' ';
+    for(auto nxt : adj[cur]){
+        if(vis[nxt])    continue;
+        dfs(nxt);
+    }
+    return;
+}
+
+void bfs(){
+    //fill(vis, vis+10002, 0); // 초기화
+    memset(vis, 0, sizeof(vis));
+    queue<int> q;
+    q.push(start);
+    vis[start] = true;
+    while(!q.empty()){
+        int cur = q.front(); q.pop();
+        cout << cur << ' ';
+        for(auto nxt : adj[cur]){
+            if(vis[nxt])    continue;
+            q.push(nxt);
+            vis[nxt] = true;
+        }
+    }
+    cout << '\n';
+    return;
+}
+
+
+ 
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n >> m >> start;
+    for(int i=0; i < m; ++i){
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    // 정접별 인접 리스트 정렬
+    for(int i=1; i <= n; ++i){
+        sort(adj[i].begin(), adj[i].end());
+    }
+
+    dfs(start);
+    cout << '\n';
+    bfs();
+
+    return 0;
+}
+```
+
+### 24479_알고리즘 수업 - 깊이 우선 탐색1
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int n, m, r, order=1;
+vector<int> adj[100002];
+bool vis[100002];
+vector<int> ans;
+
+void dfs(int cur){
+    vis[cur] = true;
+    ans[cur] = order++;
+    for(auto nxt : adj[cur]){
+        if(!vis[nxt])    dfs(nxt);
+    }
+    return;
+}
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    cin >> n >> m >> r;
+    ans.resize(n+1, 0); // 1 ~ n까지 사용하므로 n+1 크기로 초기화
+    for(int i=0; i < m; ++i){
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+
+    for(int i=1; i <= n; ++i)
+        sort(adj[i].begin(), adj[i].end());
+
+    dfs(r);
+    
+    for(int i=1; i <= n; ++i)
+        cout << ans[i] << '\n';
+    
+    return 0;
+}
+```
+### 16964_DFS 스페셜 저지
+-> DFS 탐색 전 인접리스트의 노드 순서를 정해진대로 정렬한 후 dfs 탐색 필요!   
+이걸 생각하는 것이 어려웠음,, 
+  
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int n, order=1, res=1;
+vector<int> adj[100002];
+bool vis[100002];
+vector<int> ans, pos;
+
+// pos에 따라 정렬(오름차순)
+bool cmp(int a, int b){
+    return pos[a] < pos[b];
+}
+
+void dfs(int cur){
+    vis[cur] = true;
+
+    // 방문 순서 안맞으면 바로 종료
+    if(cur != ans[order]){
+        res = 0;
+        return;
+    }
+    order++;
+
+    for(auto nxt : adj[cur]){
+        if(!vis[nxt]){
+            dfs(nxt);
+            if(res == 0)    return;
+        }   
+    }
+    return;
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+    
+    cin >> n;
+    ans.resize(n+1, 0);
+    pos.resize(n+1, 0);
+
+    for(int i=0; i < n-1; ++i){
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+    }
+    
+    for(int i=1; i <= n; ++i){
+        cin >> ans[i];
+        pos[ans[i]] = i; // ans[i]의 순서 저장
+    }
+    
+    // 각 노드의 인접 노드들을 'ans'의 방문 순서에 맞춰 정렬 필요 
+    // 즉, 지정된 노드 탐색 순서로 정렬이 필요 ,,,
+    for(int i=1; i <= n; ++i){
+        sort(adj[i].begin(), adj[i].end(), cmp);
+    }
+    dfs(1);
+    cout << res;
+    return 0;
+}
+```

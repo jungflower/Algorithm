@@ -90,7 +90,7 @@ void dfs(int idx, int k){
     for(int i=idx; i < 25; ++i){
         if(!isused[i]){
             isused[i] = 1;
-            dfs(i, k+1);
+            dfs(i+1, k+1);
             isused[i] = 0;
         }
     }

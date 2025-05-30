@@ -240,4 +240,188 @@ int main(){
 4. 사각지대 최소값 계산  
 5. 최소 사각지대 출력  
 
+### 15686_치킨배달  
+```cpp
+#include <iostream>
+#include <vector>
+#include <cmath>
+using namespace std;
+
+int n, m;
+int board[52][52];
+struct Pos {int y; int x;};
+vector<Pos> chickenPos; // 치킨집 좌표
+int isused[15]; // 치킨집 사용 여부 저장
+int res[52][52]; // 각 도시 정보
+int ans = 1e9; // 치킨 거리 최솟값
+
+void input(){
+    cin >> n >> m;
+    for(int i=1; i <= n; ++i){
+        for(int j=1; j <= n; ++j){
+            cin >> board[i][j];
+            if(board[i][j] == 2)    chickenPos.push_back({i, j});
+        }
+    }
+}
+
+
+// 선택한 치킨집과의 치킨 거리 최솟값
+int solve(vector<int>& chicken){
+    int res = 0;
+    for(int y=1; y <= n; ++y){
+        for(int x=1; x <= n; ++x){
+            // 집이면 모든 치킨집과의 거리를 구하기 
+            if(board[y][x] == 1){
+                int tmp = 1e9;
+                for(auto dir : chicken){
+                    int path = abs(y - chickenPos[dir].y) + abs(x - chickenPos[dir].x);
+                    tmp = min(tmp, path);
+                }
+                res += tmp;
+            }    
+        }
+    }
+
+    return res;
+}
+
+// 치킨 집 m개 선택
+void dfs(int idx, int start, vector<int>& chicken){
+    if(idx == m){
+        int res = solve(chicken);
+        ans = min(res, ans);
+        return;
+    }
+
+    for(int i=start; i < chickenPos.size(); ++i){
+        if(!isused[i]){
+            chicken.push_back(i);
+            isused[i] = 1; 
+            dfs(idx+1, i+1, chicken);
+            isused[i] = 0;
+            chicken.pop_back();
+        }
+    }
+
+}
+
+int main(){
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    input();
+    vector<int> chicken;
+    dfs(0, 0, chicken);
+    cout << ans << '\n';
+
+    return 0;
+}
+```
+
+### 11559_Puyo Puyo
+```cpp
+#include <iostream>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+char board[12][6];
+int ans;
+struct Pos { int y, x; };
+int dy[4] = { 0, 1, 0, -1 };
+int dx[4] = { 1, 0, -1, 0 };
+
+void input() {
+    for (int i = 0; i < 12; ++i) {
+        for (int j = 0; j < 6; ++j) {
+            cin >> board[i][j];
+        }
+    }
+}
+
+//  뿌요 탐색 하는 함수 
+bool bfs(int y, int x, char color) {
+    queue<Pos> q;
+    vector<Pos> same_color;
+    bool discovered[12][6];
+    memset(discovered, false, sizeof(discovered));
+
+    q.push({ y, x });
+    discovered[y][x] = true;
+    same_color.push_back({ y, x });
+
+    while (!q.empty()) {
+        Pos cur = q.front(); q.pop();
+        for (int dir = 0; dir < 4; ++dir) {
+            int ny = cur.y + dy[dir];
+            int nx = cur.x + dx[dir];
+            if (ny < 0 || ny >= 12 || nx < 0 || nx >= 6) continue;
+            if (!discovered[ny][nx] && board[ny][nx] == color) {
+                q.push({ ny, nx });
+                same_color.push_back({ ny, nx });
+                discovered[ny][nx] = true;
+            }
+        }
+    }
+
+    if (same_color.size() >= 4) {
+        for (Pos p : same_color) {
+            board[p.y][p.x] = '.';
+        }
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+// 뿌요 내리는 함수 
+void down() {
+    for (int x = 0; x < 6; ++x) {
+        int emptyRow = 11;
+        for (int y = 11; y >= 0; --y) {
+            // 색깔인 부분 아래 . 이있는지 emptyrow로 판단
+            if (board[y][x] != '.') {
+                if (emptyRow != y) {
+                    board[emptyRow][x] = board[y][x];
+                    board[y][x] = '.';
+                }
+                --emptyRow;
+            }
+        }
+    }
+}
+
+void solve() {
+    while (1) {
+        bool check = false;
+        for (int i = 0; i < 12; ++i) {
+            for (int j = 0; j < 6; ++j) {
+                // 보드가 색깔인 부분에서 -> 탐색 했을 때 연쇄 파괴 여부 파악
+                if (board[i][j] != '.' && bfs(i, j, board[i][j])) {
+                    check = true;
+                }
+            }
+        }
+
+        if (!check)  break;
+        else {
+            down();
+            ++ans;
+        }
+    }
+    cout << ans << '\n';
+}
+
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    input();
+    solve();
+
+    return 0;
+}
+```
 

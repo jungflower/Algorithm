@@ -425,3 +425,112 @@ int main() {
 }
 ```
 
+### 14891_톱니바퀴  
+알고리즘 설계  
+1. input 입력 : 문자열로 입력받고, 정수로 변환해서 각 값을 저장  
+2. 톱니바퀴 방향 정하기: setDirection()
+3. 방향에 맞춰 회전하는 함수: rotate()
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int wheel[4][8];
+
+void input() {
+    for (int i = 0; i < 4; ++i) {
+        string s;
+        cin >> s;
+        for (int j = 0; j < 8; ++j) {
+            wheel[i][j] = s[j] - '0';
+        }
+    }
+}
+
+void rotate(int dir[]) {
+    for (int num = 0; num < 4; ++num) {
+        // 시계 방향
+        if (dir[num] == 1) {
+            int last = wheel[num][7];
+            for(int i=7; i > 0; --i){
+                wheel[num][i] = wheel[num][i-1];
+            }
+            wheel[num][0] = last;
+        }
+        // 반시계 방향 
+        else if (dir[num] == -1) {
+            int first = wheel[num][0];
+            for(int i = 0; i < 7; ++i){
+                wheel[num][i] = wheel[num][i+1];
+            }
+            wheel[num][7] = first;
+        }
+    }
+}
+
+void setDirection(int start, int start_dir) {
+    int dir[4] = { 0, }; // 각 톱니바퀴의 방향 저장
+    dir[start] = start_dir;
+
+    // 오른쪽 방향으로 각 톱니바퀴 방향 비교
+    for (int num = start; num < 3; ++num) {
+        if (wheel[num][2] != wheel[num + 1][6]) {
+            if (dir[num] == 1)  dir[num + 1] = -1;
+            else if (dir[num] == -1)    dir[num + 1] = 1;
+        }
+    }
+
+    // 왼쪽 방향으로 각 톱니바퀴 방향 비교
+    for (int num = start; num > 0; --num) {
+        if (wheel[num][6] != wheel[num - 1][2]) {
+            if (dir[num] == 1)  dir[num - 1] = -1;
+            else if (dir[num] == -1)    dir[num - 1] = 1;
+        }
+    }
+    rotate(dir);
+    return;
+}
+
+void solve() {
+    int k;
+    cin >> k;
+    while (k--) {
+        int start, dir; // 1 시계, -1 반시계 
+        cin >> start >> dir;
+        setDirection(start - 1, dir);
+    }
+
+    int ans = 0;
+    for (int num = 0; num < 4; ++num) {
+        switch (num) {
+        case 0:
+            if (wheel[num][0])   ans += 1;
+            break;
+        case 1:
+            if (wheel[num][0])   ans += 2;
+            break;
+        case 2:
+            if (wheel[num][0])   ans += 4;
+            break;
+        case 3:
+            if (wheel[num][0])   ans += 8;
+            break;
+        }
+    }
+    cout << ans << '\n';
+    return;
+}
+
+
+int main() {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
+
+    input();
+    solve();
+
+    return 0;
+}
+```
+
